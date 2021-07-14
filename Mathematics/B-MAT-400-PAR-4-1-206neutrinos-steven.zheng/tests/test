@@ -1,0 +1,54 @@
+#!/usr/bin/python3
+import unittest
+
+def check_if_number(input):
+    try:
+        value = int(input)
+    except ValueError:
+        try:
+            value = float(input)
+        except ValueError:
+            print("Not a number")
+            return (84)
+    return value
+
+def error_handler(argv):
+    arr = []
+    if (len(argv) == 2 and argv[1] == "-h"):
+        print("USAGE")
+        print("\t./206neutrinos n a h sd\n")
+        print("DESCRIPTION")
+        print("\tn\tnumber of values\n\ta\t arithmetic mean\n\th\tharmonic mean\n\tsd\t standard deviation")
+        return (0)
+    if (len(argv) != 5):
+        return (84)
+    for i in range(1, len(argv)):
+        arr.append(check_if_number(argv[i]))
+    if (arr[0] < 0):
+        return (84)
+    return(arr)
+
+####### UNIT TEST #########
+
+class MyTest(unittest.TestCase):
+
+    def test_correct_param_passed(self):
+        argv = ["./206neutrinos", "12000", "297514", "297912", "4363"]
+        arr = [12000,297514,297912,4363]
+        self.assertEqual(error_handler(argv), arr)
+    def test_not_numbers_param_passed(self):
+        argv = ["./206neutrinos", "hello", "world", "29f7912", "4363"]
+        self.assertEqual(error_handler(argv), [84, 84, 84, 4363])
+    def test_not_enough_param(self):
+        argv = ["./206neutrinos", "12000", "297912", "4363"]
+        self.assertEqual(error_handler(argv), 84)
+    def test_too_much_param(self):
+        argv = ["./206neutrinos", "12000", "297514", "297912", "4363", "5646"]
+        self.assertEqual(error_handler(argv), 84)
+    def test_negative_n(self):
+        argv = ["./206neutrinos", "-12000", "297514", "297912", "4363"]
+        self.assertEqual(error_handler(argv), 84)
+
+if __name__ == "__main__":
+    unittest.main()
+

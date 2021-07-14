@@ -1,0 +1,67 @@
+#!/usr/bin/python3
+import sys
+import math
+import time
+
+def combination(n, k):
+    return ((math.factorial(n)) // (math.factorial(k) * math.factorial(n - k)))
+
+def binomial(k, n, p):
+    return combination(n, k) * math.pow(p, k) * math.pow(1 - p, n - k)
+
+def binomialDistribution(d):
+    start_time = time.time()
+    p = (d / 28800)
+    overload = 0
+    for i in range(0, 51):
+        print(i, "-> ", end="")
+        print(format(binomial(i, 3500, p), ".3f"), end="")
+        if (i > 25):
+            overload = overload + binomial(i, 3500, p)
+        if ((i + 1) % 5 == 0 or i == 49):
+            print()
+        else:
+            print(end="\t" if i != 50 else "")
+    print("\nOverload: " + format(overload * 100, ".01f") + "%")
+    print("Computation time:", "%.2f" % ((time.time() - start_time) * 1000) + "ms")
+
+def poisson(k, l):
+    return (math.exp(l * (-1)) * math.pow(l, k) / math.factorial(k))
+
+def poissonDistribution(d):
+    start_time = time.time()
+    p = (d / 28800) * 3500
+    overload = 0
+    for i in range(0, 51):
+        print(i, "-> ", end="")
+        print(format(poisson(i, p), ".3f"), end="")
+        if (i > 25):
+            overload = overload + poisson(i, p)
+        if ((i + 1) % 5 == 0 or i == 49):
+            print()
+        else:
+            print(end="\t" if i != 50 else "")
+    print("\nOverload: " + format(overload * 100, ".01f") + "%")
+    print("Computation time:", "%.2f" % ((time.time() - start_time) * 1000) + "ms")
+
+def error_handler():
+    if (len(sys.argv) != 2 and len(sys.argv) != 3):
+        return 84
+    for index in range(1, len(sys.argv)):
+        if not sys.argv[index].isnumeric():
+            return 84
+    return 0
+
+if __name__ == "__main__":
+    if (error_handler() == 84):
+        exit(84)
+    if (len(sys.argv) == 3):
+        print(sys.argv[2] + "-combinations of a set of size " + sys.argv[1] + ":")
+        print(int(combination(int(sys.argv[1]), int(sys.argv[2]))))
+    if (len(sys.argv) == 2):
+        print("Binomial distribution:")
+        binomialDistribution(int(sys.argv[1]))
+        print()
+        print("Poisson distribution:")
+        poissonDistribution(int(sys.argv[1]))
+    exit(0)

@@ -1,0 +1,157 @@
+#!/usr/bin/python3
+import sys
+import math
+
+arr = [
+    [0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+    [0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+    [0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+    [0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+    [0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+    [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+]
+
+def error_handler():
+    if (len(sys.argv) != 3):
+        exit(84)
+    for index in range(1, len(sys.argv) - 1):
+        if not sys.argv[index].isnumeric():
+            exit(84)
+    if (int(sys.argv[1]) < 50 or int(sys.argv[2]) < 50):
+        exit(84)
+
+error_handler()
+
+def array(c, d):
+    x = 10
+    y = 10
+    a = int(c)
+    b = int(d)
+    for i in range(0, 5):
+        for j in range (0, 5):
+            arr[i][j] = ((a - x * (i + 1))) * (b - y * (j + 1)) / ((5 * a - 150) * (5 * b - 150))
+    for j in range(0, 5):
+        for i in range(0, 5):
+            arr[5][j] = float(arr[5][j]) + float(arr[i][j])
+    for j in range(0, 6):
+        for i in range(0, 5):
+            arr[j][5] = float(arr[j][5]) + float(arr[j][i])
+    return (arr)
+
+
+def calc_z(arr):
+    z = 0
+    index = 0
+    a = 0
+    j = 0
+    i = 0
+    z_arr = [0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00]
+
+    while a < 9:
+        while j < 5:
+            while i < 5:
+                if (j + i) == index:
+                    z = z + float(arr[j][i])
+                i = i + 1
+            j = j + 1
+            i = 0
+        j = 0
+        i = 0
+        z_arr[a] = z
+        z = 0
+        a = a + 1
+        index = index + 1
+    return (z_arr)
+
+arrr = array(sys.argv[1], sys.argv[2])
+
+def calc_expected_value(arr, var):
+    expected_value = 0
+    dec = 10
+    if (var == 'x'):
+        for index in range(0,5):
+            expected_value = expected_value + dec * arr[index][5]
+            dec = dec + 10
+    if (var == 'y'):
+        for index in range(0,5):
+            expected_value = expected_value + dec * arr[5][index]
+            dec = dec + 10
+    if (var == 'z'):
+        dec = 20
+        for index in range(0,9):
+            expected_value = expected_value + dec * z_array[index]
+            dec = dec + 10
+    return expected_value
+
+def calc_expected_value_bis(arr, var):
+    expected_value = 0
+    dec = 10
+    if (var == 'x'):
+        for index in range(0,5):
+            expected_value = expected_value + math.pow(dec,2) * arr[index][5]
+            dec = dec + 10
+    if (var == 'y'):
+        for index in range(0,5):
+            expected_value = expected_value + math.pow(dec,2) * arr[5][index]
+            dec = dec + 10
+    if (var == 'z'):
+        dec = 20
+        for index in range(0,9):
+            expected_value = expected_value + math.pow(dec,2) * z_array[index]
+            dec = dec + 10
+    return expected_value
+
+def variance(arr, var):
+    variance_value = 0
+    if (var == 'x'):
+        variance_value = calc_expected_value_bis(arr, 'x') - math.pow(calc_expected_value(arr, 'x'), 2)
+    if (var == 'y'):
+        variance_value = calc_expected_value_bis(arr, 'y') - math.pow(calc_expected_value(arr, 'y'), 2)
+    if (var == 'z'):
+        variance_value = calc_expected_value_bis(arr, 'z') - math.pow(calc_expected_value(arr, 'z'), 2)
+    return variance_value
+
+z_array = calc_z(arr)
+
+print("--------------------------------------------------------------------------------")
+print("\tX=10\tX=20\tX=30\tX=40\tX=50\tY law", end='')
+for i in range(0, 6):
+    if i<5:
+        print("\nY=", end='')
+        print((i + 1) * 10, end='')
+    else:
+        print("\nX law", end='')
+    for j in range (0, 6):
+        print('\t', end='')
+        print(format(arrr[j][i], ".3f"), end='')
+print("\n--------------------------------------------------------------------------------")
+print("z\t20\t30\t40\t50\t60\t70\t80\t90\t100")
+print("p(Z=z)", end='')
+for i in range(0, 9):
+    print('\t', end='')
+    print(format(z_array[i], ".3f"), end='')
+print("\n--------------------------------------------------------------------------------")
+
+expected_value_x = calc_expected_value(arr, 'x')
+variance_x = variance(arr, 'x')
+
+expected_value_y = calc_expected_value(arr, 'y')
+variance_y = variance(arr, 'y')
+
+expected_value_z = calc_expected_value(arr, 'z')
+variance_z = variance(arr, 'z')
+
+print("expected value of X:\t", end='')
+print(format(expected_value_x, ".1f"))
+print("variance of X:\t\t", end='')
+print(format(variance_x, ".1f"))
+print("expected value of Y:\t", end='')
+print(format(expected_value_y, ".1f"))
+print("variance of Y:\t\t", end='')
+print(format(variance_y, ".1f"))
+print("expected value of Z:\t", end='')
+print(format(expected_value_z, ".1f"))
+print("variance of Z:\t\t", end='')
+print(format(variance_z, ".1f"))
+print("--------------------------------------------------------------------------------")
+

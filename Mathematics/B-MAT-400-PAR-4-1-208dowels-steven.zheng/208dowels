@@ -1,0 +1,185 @@
+#!/usr/bin/python3
+from math import *
+import sys
+import time
+
+table = [
+    [99, 0.00, 0.02, 0.11, 0.30, 0.55, 0.87, 1.24, 1.65, 2.09, 2.56],
+    [90, 0.02, 0.21, 0.58, 1.06, 1.61, 2.20, 2.83, 3.49, 4.17, 4.87],
+    [80, 0.06, 0.45, 1.01, 1.65, 2.34, 3.07, 3.82, 4.59, 5.38, 6.18],
+    [70, 0.15, 0.71, 1.42, 2.19, 3.00, 3.83, 4.67, 5.53, 6.39, 7.27],
+    [60, 0.27, 1.02, 1.87, 2.75, 3.66, 4.57, 5.49, 6.42, 7.36, 8.30],
+    [50, 0.45, 1.39, 2.37, 3.36, 4.35, 5.35, 6.35, 7.34, 8.34, 9.34],
+    [40, 0.71, 1.83, 2.95, 4.04, 5.13, 6.21, 7.28, 8.35, 9.41, 10.47],
+    [30, 1.07, 2.41, 3.66, 4.88, 6.06, 7.23, 8.38, 9.52, 10.66, 11.78],
+    [20, 1.64, 3.22, 4.64, 5.99, 7.29, 8.56, 9.80, 11.03, 12.24, 13.44],
+    [10, 2.71, 4.61, 6.25, 7.78, 9.24, 10.64, 12.02, 13.36, 14.68, 15.99],
+    [5, 3.84, 5.99, 7.81, 9.49, 11.07, 12.59, 14.07, 15.51, 16.92, 18.31],
+    [2, 5.41, 7.82, 9.84, 11.67, 13.39, 15.03, 16.62, 18.17, 19.68, 21.16],
+    [1, 6.63, 9.21, 11.34, 13.28, 15.09, 16.81, 18.48, 20.09, 21.67, 23.21]
+    ]
+
+def binom(n, k):
+    return (factorial(n) / (factorial(k) * factorial(n - k)))
+
+def theorical (n, x, p):
+    return (n * binom(n, x) * pow(p, x) * pow((1 - p), n - x))
+
+def ceof_p(n_coef, n_theo, numbers):
+    total = 0.0000
+    index = 0.0000
+    total2 = 0.0000
+    for nb in numbers:
+        total += index * nb
+        index = index + 1
+    total2 = total / (n_coef * n_theo)
+    return (total2)
+
+def nb_pieces(numbers):
+    total = 0
+    for nb in numbers:
+        total += nb
+    return (total)
+
+def merge_classes(classes):
+    i = 0
+    tot = 0
+    merged = classes
+    if min(classes) >= 10:
+        return (classes)
+    else:
+        i = classes.index(min(classes))
+        if i != 0 and i != len(classes) - 1 and classes[i - 1] <= classes[i + 1]:
+            tot = sum(classes[i - 1:i + 1])
+            del classes[i]
+            classes[i - 1] = tot
+        elif i != 0 and i != len(classes) - 1 and classes[i - 1] >= classes[i + 1]:
+            tot = sum(classes[i:i + 2])
+            del classes[i + 1]
+            classes[i] = tot
+        elif i == 0:
+            tot = sum(classes[i:i + 2])
+            del classes[i + 1]
+            classes[i] = tot
+        elif i == len(classes) - 1:
+            tot = sum(classes[i - 1:i + 1])
+            del classes[i]
+            classes[i - 1] = tot
+        merge_classes(classes)
+        return classes
+
+def print_table(arr, merged):
+    arr2 = []
+    i = 0
+    j = 0
+    index = 1
+    print ("   x\t| ", end='')
+    while j < len(merged):
+        while sum(arr[i:index]) != merged[j]:
+            index += 1
+        if j != len(merged) - 1 and index - i != 1:
+            print (str(i) + "-" + str(index - 1) + "\t| ", end='')
+        elif j != len(merged) - 1 and index - i == 1:
+            print (str(i) + "\t| ", end='')
+        else:
+            print (str(i) + "+\t| ", end='')
+        j += 1
+        i = index
+    print ("Total")
+    j = 0
+    print("  Ox\t| ", end='')
+    while j <= len(merged) - 1:
+        print (str(merged[j]) + "\t| ", end='')
+        if j == len(merged) - 1:
+            print (nb_pieces(merged))
+        j += 1
+    i = 0
+    j = 0
+    index = 1
+    tot = 0
+    total = 0
+    print ("  Tx\t| ", end='')
+    while j < len(merged):
+        while sum(arr[i:index - 1]) != merged[j]:
+            tot += theorical(nb_pieces(arr), index - 1, ceof_p(nb_pieces(arr), nb_pieces(arr), arr))
+            #print (theorical(nb_pieces(arr), index - 1, ceof_p(nb_pieces(arr), nb_pieces(arr), arr)))
+            index += 1
+        if j == len(merged) - 1:
+            arr2.append(nb_pieces(arr) - total)
+            #print (str(round(nb_pieces(arr) - total, 1)) + "\t| ", end='')
+            print (str(round(nb_pieces(arr) - total, 1)) + "\t| ", end='')
+        else:
+            arr2.append(tot)
+            print (str(round(tot, 1)) + "\t| ", end='')
+        if j == len(merged) - 1:
+            print (nb_pieces(merged))
+        j += 1
+        i = index - 1
+        total += tot
+        tot = 0
+    return (arr2)
+    
+def print_chi_squared(ox, tx):
+    tot = 0
+    i = 0
+    while i != len(ox):
+        tot += pow(ox[i] - tx[i], 2) / tx[i]
+        i += 1
+    print("Chi-squared:\t\t" + "{0:.3f}".format(tot))
+    return tot
+
+def find_percent(df, x):
+    i = 12
+    percent = 0
+    while i != 0:
+        if table[i][df] < x:
+            percent = table[i][0]
+            break
+        i = i - 1
+    if percent == 0:
+        print ("Fit validity:\t\tP > 99%")
+    elif percent == 1:
+        print ("Fit validity:\t\tP < 1%")
+    else:
+        print ("Fit validity:\t\t" + str(percent - 10) + "% < P < " + str(percent) + "%")
+    
+    
+    
+def check_if_number(input):
+    try:
+        value = int(input)
+    except ValueError:
+        try:
+            value = float(input)
+        except ValueError:
+            return -1
+    return value
+
+def error_handler():
+    arr = []
+    if (len(sys.argv) == 2 and sys.argv[1] == "-h"):
+        print("USAGE")
+        print("\t./208dowels O0 O1 O2 O3 O4 O5 O6 O7 O8\n")
+        print("DESCRIPTION")
+        print("\tOi\tsize of the observed class")
+        exit(0)
+    if (len(sys.argv) != 10):
+        exit(84)
+    for i in range(1, len(sys.argv)):
+        arr.append(check_if_number(sys.argv[i]))
+        if (arr[i - 1] < 0):
+            exit(84)
+    return(arr)
+
+if __name__ == "__main__":
+    arr = []
+    arr = error_handler()
+    arr2 = arr
+    arr2 = merge_classes(error_handler())
+    k = len(arr2) - 2
+    arr3 = print_table(arr, arr2)
+    print("Distribution:\t\t" + "B(" + str(nb_pieces(arr)) + ", " + "{0:.4f}".format(float(ceof_p(nb_pieces(arr), nb_pieces(arr), arr))) + ")")
+    chi_squared = print_chi_squared(arr2, arr3)
+    print("Degrees of freedom:\t" + str(k))
+    find_percent(k, chi_squared)
+    exit(0)

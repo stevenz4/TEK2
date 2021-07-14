@@ -1,0 +1,95 @@
+#!/usr/bin/python3
+import sys
+import math
+        
+def permutation (n):
+    return (math.factorial(n))
+
+def combination (n, k):
+    return (math.factorial(n) / (math.factorial(k) * math.factorial(n - k)))
+
+def comb (dices, spec):
+    nb = 5
+    for i in range(1, 6):
+        for j in range(0,5):
+            if int(dices[i]) == int(spec[j]):
+                nb = nb - 1
+                dices[j] = -1
+                break
+    return (nb)
+
+def nb_of(dices, nb):
+    j = 0
+    for i in range(1, 6):
+        if int(nb) == int(dices[i]):
+            j = j + 1
+    return (j)
+
+def yams(dices, nb, type):
+    i = nb_of(dices, nb)
+    j = 0
+    h = type - nb_of(dices, nb)
+    if i >= type:
+        return "100.00"
+    else:
+        while h <= comb(dices, [nb, nb, nb, nb, nb]):
+            j = j + (combination(comb(dices, [nb, nb, nb, nb, nb]), h) * math.pow(1/6, h) * math.pow(5/6, comb(dices, [nb, nb, nb, nb, nb]) - h))
+            h = h + 1
+    return format(j * 100, ".2f")
+
+def full_house(dices, three, pair):
+    three_nb = 0
+    pair_nb = 0
+    free_dice = 0
+    for index in range(1,6):
+        if dices[index] == three:
+            three_nb = three_nb + 1
+        elif dices[index] == pair:
+            pair_nb = pair_nb + 1
+        else:
+            free_dice = free_dice + 1
+    if (three_nb < 3 and pair_nb < 2):
+        result_three_solo = (combination(3 + free_dice, 3 - three_nb) * math.pow(1/6, 3 - three_nb) * math.pow(1 - 1/6, (3 + free_dice) - (3 - three_nb)))
+        result_pair_solo = (combination(2 + free_dice, 2 - pair_nb) * math.pow(1/6, 2 - pair_nb) * math.pow(1 - 1/6, (2 + free_dice) - (2 - pair_nb)))
+        return result_pair_solo * result_three_solo
+    if (three_nb < 3 and pair_nb >= 2):
+        result_three = (combination(3 - three_nb, 3 - three_nb) * math.pow(1/6, 3 - three_nb))
+        return result_three
+    if (three_nb >= 3 and pair_nb < 2):
+        result_pair = (combination(2 - pair_nb, 2 - pair_nb) * math.pow(1/6, 2 - pair_nb))
+        return result_pair
+    return 1
+
+if (len(sys.argv) != 7):
+    exit(84)
+
+for index in range(1, len(sys.argv) - 1):
+    if not sys.argv[index].isnumeric():
+        exit(84)
+
+if (sys.argv[6].find('_') != -1):
+    parse = sys.argv[6].split("_")
+
+if (parse[0] == "pair"):
+    result = yams(sys.argv, int(parse[1]), 2)
+    print("Chances to get a " + parse[1] + " pair: " + result + '%')
+    exit(0)
+if (parse[0] == "three"):
+    result = yams(sys.argv, int(parse[1]), 3)
+    print("Chances to get a " + parse[1] + " three-of-a-kind: " + result + '%')
+    exit(0)
+if (parse[0] == "four"):
+    result = yams(sys.argv, int(parse[1]), 4)
+    print("Chances to get a " + parse[1] + " four-of-a-kind: " + result + '%')
+    exit(0)
+if (parse[0] == "yams"):
+    result = yams(sys.argv, int(parse[1]), 5)
+    print("Chances to get a " + parse[1] + " yams: " + result + '%')
+    exit(0)
+if (parse[0] == "full"):
+    if (len(parse) == 3):
+        result = full_house(sys.argv, parse[1], parse[2])
+        result = format(result * 100, ".2f")
+        print("Chances to get a " + parse[1] + " full of " + parse[2] + ": " + result + '%')
+        exit(0)
+exit(84)
