@@ -1,0 +1,9 @@
+a.out
+test_main.cpp
+unit_tests
+*.o
+*.gcno
+*.gcda
+main.cpp
+santa
+.vscode

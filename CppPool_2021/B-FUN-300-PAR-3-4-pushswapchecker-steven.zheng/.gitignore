@@ -1,0 +1,4 @@
+pushswap_checker
+*.hi
+*.o
+a.out

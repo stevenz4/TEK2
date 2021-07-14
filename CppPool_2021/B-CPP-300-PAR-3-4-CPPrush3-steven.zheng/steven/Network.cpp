@@ -1,0 +1,108 @@
+/*
+** EPITECH PROJECT, 2021
+** Network
+** File description:
+** Rush 3
+*/
+
+#include "Network.hpp"
+
+Network::Network() : IMonitorModule()
+{
+    this->_moduleName = "Network";
+    this->_display = false;
+
+    std::ifstream file ("/proc/net/dev"), file_bis ("/proc/net/dev");
+    std::string line;
+    std::string netInfo;
+    int bytes_r, packets_r, errs_r, drop_r, fifo_r, frame_r, compressed_r, multicast_r;
+    int bytes_t, packets_t, errs_t, drop_t, fifo_t, frame_t, compressed_t, multicast_t;
+
+    getline(file_bis, line);
+    getline(file_bis, line);
+    while (getline(file_bis, line))
+        this->interface_nb = this->interface_nb + 1;
+    this->netInter = new network_inter[this->interface_nb + 1];
+    getline(file, line);
+    for (int j = 0; getline(file, line); j++) {
+        file >> this->netInter[j]._interface >> bytes_r >> packets_r >> errs_r >> drop_r >> fifo_r >> frame_r >> compressed_r >> multicast_r;
+        file >> bytes_t >> packets_t >> errs_t >> drop_t >> fifo_t >> frame_t >> compressed_t >> multicast_t;
+        this->netInter[j].receive.push_back(bytes_r);
+        this->netInter[j].receive.push_back(packets_r);
+        this->netInter[j].receive.push_back(errs_r);
+        this->netInter[j].receive.push_back(drop_r);
+        this->netInter[j].receive.push_back(fifo_r);
+        this->netInter[j].receive.push_back(frame_r);
+        this->netInter[j].receive.push_back(compressed_r);
+        this->netInter[j].receive.push_back(multicast_r);
+        this->netInter[j].transmit.push_back(bytes_t);
+        this->netInter[j].transmit.push_back(packets_t);
+        this->netInter[j].transmit.push_back(errs_t);
+        this->netInter[j].transmit.push_back(drop_t);
+        this->netInter[j].transmit.push_back(fifo_t);
+        this->netInter[j].transmit.push_back(frame_t);
+        this->netInter[j].transmit.push_back(compressed_t);
+        this->netInter[j].transmit.push_back(multicast_t);
+        netInfo.append(line + '\n');
+    }
+}
+
+Network::~Network()
+{
+}
+
+bool const &Network::getDisplay() const
+{
+    return this->_display;
+}
+
+std::string const &Network::getModuleName() const
+{
+    return this->_moduleName;
+}
+
+void Network::refreshNetInterface()
+{
+    this->interface_nb = 0;
+    delete [] this->netInter;
+    std::ifstream file ("/proc/net/dev"), file_bis ("/proc/net/dev");
+    std::string line;
+    std::string netInfo;
+    int bytes_r, packets_r, errs_r, drop_r, fifo_r, frame_r, compressed_r, multicast_r;
+    int bytes_t, packets_t, errs_t, drop_t, fifo_t, frame_t, compressed_t, multicast_t;
+
+    getline(file_bis, line);
+    getline(file_bis, line);
+    while (getline(file_bis, line))
+        this->interface_nb = this->interface_nb + 1;
+    this->netInter = new network_inter[this->interface_nb + 1];
+    getline(file, line);
+    for (int j = 0; getline(file, line); j++) {
+        file >> this->netInter[j]._interface >> bytes_r >> packets_r >> errs_r >> drop_r >> fifo_r >> frame_r >> compressed_r >> multicast_r;
+        file >> bytes_t >> packets_t >> errs_t >> drop_t >> fifo_t >> frame_t >> compressed_t >> multicast_t;
+        this->netInter[j].receive.push_back(bytes_r);
+        this->netInter[j].receive.push_back(packets_r);
+        this->netInter[j].receive.push_back(errs_r);
+        this->netInter[j].receive.push_back(drop_r);
+        this->netInter[j].receive.push_back(fifo_r);
+        this->netInter[j].receive.push_back(frame_r);
+        this->netInter[j].receive.push_back(compressed_r);
+        this->netInter[j].receive.push_back(multicast_r);
+        this->netInter[j].transmit.push_back(bytes_t);
+        this->netInter[j].transmit.push_back(packets_t);
+        this->netInter[j].transmit.push_back(errs_t);
+        this->netInter[j].transmit.push_back(drop_t);
+        this->netInter[j].transmit.push_back(fifo_t);
+        this->netInter[j].transmit.push_back(frame_t);
+        this->netInter[j].transmit.push_back(compressed_t);
+        this->netInter[j].transmit.push_back(multicast_t);
+        netInfo.append(line + '\n');
+    }
+    for (int j = 0; j < this->interface_nb; j++) {
+        for (int k = 0; k < 8; k++)
+            std::cout << this->netInter[j].receive[k] << "   ";
+        for (int k = 0; k < 8; k++)
+            std::cout << this->netInter[j].transmit[k] << "   ";
+        std::cout << std::endl;
+    }
+}
