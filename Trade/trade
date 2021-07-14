@@ -1,0 +1,126 @@
+#!/usr/bin/python3
+from math import *
+import sys
+import time
+import csv
+from io import StringIO
+
+player_name = ""
+stack_btc = 0
+stack_eth = 0
+stack_usdt = 0
+transactionFee = 0
+candlesGiven = 0
+candlesTotal = 0
+std_dev_btc = 0
+std_dev_eth = 0
+mean_value_btc = 0
+mean_value_eth = 0
+date = 0
+volume = 0
+high = 0
+low = 0
+toOpen = 0
+toClose = 0
+values_btc = []
+values_eth = []
+inter_btc = [0, 0]
+inter_eth = [0, 0]
+
+def calcMean(values):
+    mean = 0
+    for i in values:
+        mean += float(i)
+    return (float(mean / len(values)))
+
+def calcStdDev(values, mean):
+    tot = 0
+    for i in values:
+         tot += float(pow(abs(float(i) - mean), 2))
+    return (sqrt(tot / len(values)))
+
+def init():
+    s = input()
+    reader = s.split(' ')
+    player_name = reader[2]
+    for i in range(0, 6):
+        s = input()
+    reader = s.split(' ')
+    candlesTotal = int(reader[2])
+    s = input()
+    reader = s.split(' ')
+    candlesGiven = int(reader[2])
+    s = input()
+    reader = s.split(' ')
+    stack = int(reader[2])
+    s = input()
+    reader = s.split(' ')
+    transactionFee = float(reader[2])
+    for i in range(0, candlesGiven + 1):
+        s = input()
+        reader = s.split(';')
+        btc_eth = reader[0].split(',')
+        usdt_eth = reader[1].split(',')
+        usdt_btc = reader[2].split(',')
+        if (candlesGiven - i <= 15):
+            values_btc.append(usdt_btc[5])
+            values_eth.append(usdt_eth[5])
+    print(values_btc, file=sys.stderr)
+    mean_value_btc = calcMean(values_btc)
+    mean_value_eth = calcMean(values_eth)
+    std_dev_btc = calcStdDev(values_btc, mean_value_btc)
+    std_dev_eth = calcStdDev(values_eth, mean_value_eth)
+    print(std_dev_eth, file=sys.stderr)
+    for i in range(candlesGiven, candlesTotal):
+        s = input()
+        print (s, file=sys.stderr)
+        reader = s.split(';')
+        btc_eth = reader[0].split(',')
+        usdt_eth = reader[1].split(',')
+        usdt_btc = reader[2].split(',')
+        values_btc.append(usdt_btc[5])
+        values_eth.append(usdt_eth[5])
+        values_btc.pop(0)
+        values_eth.pop(0)
+        print(std_dev_eth, file=sys.stderr)
+        mean_value_btc = calcMean(values_btc)
+        mean_value_eth = calcMean(values_eth)
+        std_dev_btc = calcStdDev(values_btc, mean_value_btc)
+        std_dev_eth = calcStdDev(values_eth, mean_value_eth)
+        s = input()
+        reader = s.split(',')
+        stack_btc = reader[0].split(':')[1]
+        stack_eth = reader[1].split(':')[1]
+        stack_usdt = reader[2].split(':')[1]
+        print (stack_usdt, file=sys.stderr)
+        s = input()
+        inter_btc[0] = mean_value_btc - 2 * std_dev_btc
+        inter_btc[1] = mean_value_btc + 2 * std_dev_btc
+        inter_eth[0] = mean_value_eth - 2 * std_dev_eth
+        inter_eth[1] = mean_value_eth + 2 * std_dev_eth
+        print (values_eth[15], file=sys.stderr)
+        print(inter_eth[1], file=sys.stderr)
+        if (float(values_eth[15]) > inter_eth[1] and float(stack_usdt) > 0):
+            print ("buy USDT_ETH " + str(float(stack_usdt) / float(values_eth[15])))
+        elif (float(values_eth[15]) < inter_eth[0] and float(stack_eth) > 0):
+            print ("sell USDT_ETH " + str(stack_eth))
+        elif (float(values_btc[15]) < inter_btc[0] and float(stack_btc) > 0):
+            print ("sell USDT_ETH " + str(stack_btc))
+        elif (float(values_btc[15]) > inter_btc[1] and float(stack_usdt) > 0):
+            print ("buy USDT_ETH " + str(float(stack_usdt) / float(values_btc[15])))
+        else:
+            print ("no_moves")
+
+if __name__ == "__main__":
+    init()
+    exit(0)
+
+    
+
+
+
+
+
+
+
+    
