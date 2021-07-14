@@ -1,0 +1,4 @@
+*.c
+arcade_nibbler.so
+arcade_sdl2.so
+arcade_ncurses.so
