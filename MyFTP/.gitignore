@@ -1,0 +1,7 @@
+client.
+client
+myftp
+client
+path/
+*.o
+a.out
